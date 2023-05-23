@@ -1,6 +1,6 @@
 # Welcome to [tw-colors](https://github.com/L-Blondy/tw-colors)
-
-Introducing the ultimate game-changer for your Tailwind app! Say goodbye to cluttered dark variants and messy CSS variables. With this tailwind plugin, switching between color themes is as effortless as changing one className. Elevate your design game and add a touch of vibrant color to your app today!
+tw-colors is fork from tw-colors
+added the opinionated color modifier
 
 ## Highlights
 
@@ -293,8 +293,10 @@ The CSS variables names can be **customized** by passing some options as `create
 The available options are: 
 * **cssVariablePrefix**, default: `'twc-'`
 * **cssVariableSuffix**, default: `''`
+* **defaultTheme**, default: `''`
 
 With the following configuration, the variables `--prefix-primary-suffix`, `--prefix-secondary-suffix`, `--prefix-brand-suffix` will be created.
+defaultTheme display the default color decorators/
 
 *tailwind.config.js*
 ```js
@@ -314,7 +316,8 @@ With the following configuration, the variables `--prefix-primary-suffix`, `--pr
             },
          }, {
             cssVariablePrefix: 'prefix-', 
-            cssVariableSuffix: '-suffix' 
+            cssVariableSuffix: '-suffix',
+            defaultTheme:'my-dark-theme'
          })
       ],
    };
