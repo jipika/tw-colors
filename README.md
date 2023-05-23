@@ -1,6 +1,6 @@
 # Welcome to [tw-colors](https://github.com/L-Blondy/tw-colors)
 tw-colors is fork from tw-colors
-added the opinionated color modifier
+added the opinionated color decorators
 
 ## Highlights
 
@@ -14,7 +14,7 @@ added the opinionated color modifier
 ## The Gist
 
 ```bash
-npm i -D tw-colors
+npm i -D @tw-colors
 ```
 
 Take an existing tailwind config and move the colors in the `createTheme` plugin, giving it a name (e.g. light).
