@@ -52,13 +52,17 @@ export type ConfigFunction = ({
 }) => ConfigObject;
 
 export interface Options {
+   defaultTheme?: string;
    cssVariablePrefix?: string;
    cssVariableSuffix?: string;
+}
+export interface DefaultColors {
+   [key: string]: string;
 }
 
 export const resolveConfig = (
    config: ConfigObject | ConfigFunction = {},
-   { cssVariablePrefix = 'twc-', cssVariableSuffix = '' }: Options = {},
+   { cssVariablePrefix = 'twc-', cssVariableSuffix = '', defaultTheme = '' }: Options = {},
 ) => {
    const resolved: {
       variants: { name: string; definition: string[] }[];
@@ -79,7 +83,7 @@ export const resolveConfig = (
       colors: {},
    };
    const configObject = typeof config === 'function' ? config({ dark, light }) : config;
-
+   const defaultColors: DefaultColors = {};
    forEach(configObject, (colors: ColorsWithScheme<'light' | 'dark'>, themeName: string) => {
       const cssSelector = `.theme-${themeName},[data-theme="${themeName}"]`;
 
@@ -105,7 +109,13 @@ export const resolveConfig = (
          name: `theme-${themeName}`,
          definition: [`&.theme-${themeName}`, `&[data-theme='${themeName}']`],
       });
-
+      // get the default properties first
+      forEach(flatColors, (colorValue, colorName) => {
+         const [h, s, l] = toHslaArray(colorValue);
+         if (defaultTheme == themeName) {
+            defaultColors[colorName] = `,${h} ${s}% ${l}%`;
+         }
+      });
       forEach(flatColors, (colorValue, colorName) => {
          // this case was handled above
          if ((colorName as any) === SCHEME) return;
@@ -123,16 +133,16 @@ export const resolveConfig = (
          resolved.colors[colorName] = ({ opacityVariable, opacityValue }) => {
             // if the opacity is set  with a slash (e.g. bg-primary/90), use the provided value
             if (!isNaN(+opacityValue)) {
-               return `hsl(var(${twcColorVariable},${h} ${s}% ${l}%) / ${opacityValue})`;
+               return `hsl(var(${twcColorVariable}${defaultColors[colorName]}) / ${opacityValue})`;
             }
             // if no opacityValue was provided (=it is not parsable to a number)
             // the twcOpacityVariable (opacity defined in the color definition rgb(0, 0, 0, 0.5)) should have the priority
             // over the tw class based opacity(e.g. "bg-opacity-90")
             // This is how tailwind behaves as for v3.2.4
             if (opacityVariable) {
-               return `hsl(var(${twcColorVariable},${h} ${s}% ${l}%) / var(${twcOpacityVariable}, var(${opacityVariable})))`;
+               return `hsl(var(${twcColorVariable}${defaultColors[colorName]}) / var(${twcOpacityVariable}, var(${opacityVariable})))`;
             }
-            return `hsl(var(${twcColorVariable},${h} ${s}% ${l}%) / var(${twcOpacityVariable}, 1))`;
+            return `hsl(var(${twcColorVariable}${defaultColors[colorName]}) / var(${twcOpacityVariable}, 1))`;
          };
       });
    });
